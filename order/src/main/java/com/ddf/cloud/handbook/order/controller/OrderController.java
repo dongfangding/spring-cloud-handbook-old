@@ -1,12 +1,13 @@
 package com.ddf.cloud.handbook.order.controller;
 
 import com.ddf.cloud.handbook.api.model.usercenter.AuthUser;
-import com.ddf.cloud.handbook.order.service.OrderBizService;
+import com.ddf.cloud.handbook.api.sdk.usercenter.AuthUserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -18,15 +19,15 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("order")
+@RequiredArgsConstructor(onConstructor=@__(@Autowired))
 public class OrderController {
 
-    @Resource(name = "orderBizServiceImpl")
-    private OrderBizService orderBizService;
+    private final AuthUserService authUserService;
 
 
     @GetMapping("listAllUser")
     public List<AuthUser> listAllUser() {
-        return orderBizService.listAllUser();
+        return authUserService.listAll();
     }
 
 }

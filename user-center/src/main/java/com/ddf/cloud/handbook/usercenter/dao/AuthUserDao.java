@@ -20,7 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AuthUserDao extends ServiceImpl<AuthUserMapper, AuthUser> {
 
-    private AuthUserMapper authUserMapper;
+    private final AuthUserMapper authUserMapper;
 
 
     /**

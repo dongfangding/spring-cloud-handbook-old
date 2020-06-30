@@ -17,10 +17,10 @@ import java.util.List;
  * @date 2020/06/29 19:04
  */
 @Service
-@RequiredArgsConstructor(onConstructor=@__(@Autowired))
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class OrderBizServiceImpl implements OrderBizService {
 
-    private AuthUserService authUserService;
+    private final AuthUserService authUserService;
 
     /**
      * 查询全部用户

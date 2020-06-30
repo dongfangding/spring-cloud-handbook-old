@@ -2,7 +2,9 @@ package com.ddf.cloud.handbook.usercenter.service;
 
 import com.ddf.cloud.handbook.api.model.usercenter.AuthUser;
 import com.ddf.cloud.handbook.api.sdk.usercenter.AuthUserService;
+import com.ddf.cloud.handbook.usercenter.dao.AuthUserDao;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +21,9 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor=@__(@Autowired))
 public class AuthUserServiceImpl implements AuthUserService {
 
-    private AuthUserService authUserService;
+    @Setter
+    private AuthUserDao authUserDao;
+
 
     /**
      * 查询全部用户列表
@@ -28,6 +32,6 @@ public class AuthUserServiceImpl implements AuthUserService {
      */
     @Override
     public List<AuthUser> listAll() {
-        return authUserService.listAll();
+        return authUserDao.listAll();
     }
 }
