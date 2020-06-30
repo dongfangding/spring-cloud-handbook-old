@@ -12,7 +12,7 @@ public class ApiConstant {
     /**
      * 用户中心服务名
      */
-    public static final String USER_CENTER_SERVICE_NAME = "USER-CENTER";
+    public static final String USER_CENTER_SERVICE_NAME = "user-center";
 
     /**
      * 用户中心context-path
@@ -22,7 +22,7 @@ public class ApiConstant {
     /**
      * 订单服务名
      */
-    public static final String ORDER_SERVICE_NAME = "USER-CENTER";
+    public static final String ORDER_SERVICE_NAME = "order";
 
     /**
      * 订单context-path
