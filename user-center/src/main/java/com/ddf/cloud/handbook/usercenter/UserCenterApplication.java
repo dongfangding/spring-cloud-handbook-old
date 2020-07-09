@@ -1,5 +1,6 @@
 package com.ddf.cloud.handbook.usercenter;
 
+import com.ddf.cloud.handbook.core.constant.GlobalConst;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -16,9 +17,9 @@ import org.springframework.web.client.RestTemplate;
  * @version 1.0
  * @date 2020/06/24 16:51
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = GlobalConst.GLOBAL_BASE_PACKAGE)
 @EnableDiscoveryClient
-@MapperScan(basePackages = "com.ddf.cloud.handbook")
+@MapperScan(basePackages = "com.ddf.cloud.handbook.usercenter.mapper")
 @EnableFeignClients(basePackages = "com.ddf.cloud.handbook.api.sdk")
 public class UserCenterApplication {
     public static void main(String[] args) {

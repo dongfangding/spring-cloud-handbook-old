@@ -10,7 +10,7 @@ import org.springframework.cloud.openfeign.FeignClient;
  * @version 1.0
  * @date 2020/06/29 18:47
  */
-@FeignClient(name = ApiConstant.ORDER_SERVICE_NAME, path = ApiConstant.ORDER_SERVER_CONTEXT)
-public interface OrderService {
+@FeignClient(name = ApiConstant.ORDER_SERVICE_NAME, path = ApiConstant.ORDER_SERVER_CONTEXT, contextId = "orderSdkService")
+public interface OrderSdkService {
 
 }

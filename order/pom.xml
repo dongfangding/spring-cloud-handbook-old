@@ -20,6 +20,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.ddf.cloud</groupId>
+            <artifactId>common-handbook-core</artifactId>
+            <version>${parent.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
         </dependency>

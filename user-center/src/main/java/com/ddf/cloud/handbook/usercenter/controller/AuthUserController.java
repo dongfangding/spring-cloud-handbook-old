@@ -1,6 +1,7 @@
 package com.ddf.cloud.handbook.usercenter.controller;
 
 import com.ddf.cloud.handbook.api.model.usercenter.AuthUser;
+import com.ddf.cloud.handbook.core.response.ResponseData;
 import com.ddf.cloud.handbook.usercenter.dao.AuthUserDao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ public class AuthUserController {
     private final AuthUserDao authUserDao;
 
     @GetMapping("listAll")
-    public List<AuthUser> listAll() {
-        return authUserDao.listAll();
+    public ResponseData<List<AuthUser>> listAll() {
+        return ResponseData.success(authUserDao.listAll());
     }
 }

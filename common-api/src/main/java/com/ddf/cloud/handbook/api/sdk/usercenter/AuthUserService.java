@@ -2,6 +2,7 @@ package com.ddf.cloud.handbook.api.sdk.usercenter;
 
 import com.ddf.cloud.handbook.api.constant.ApiConstant;
 import com.ddf.cloud.handbook.api.model.usercenter.AuthUser;
+import com.ddf.cloud.handbook.core.response.ResponseData;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -14,7 +15,7 @@ import java.util.List;
  * @version 1.0
  * @date 2020/06/29 16:26
  */
-@FeignClient(name = ApiConstant.USER_CENTER_SERVICE_NAME, path = ApiConstant.USER_CENTER_SERVER_CONTEXT)
+@FeignClient(name = ApiConstant.USER_CENTER_SERVICE_NAME, path = ApiConstant.USER_CENTER_SERVER_CONTEXT, contextId = "authUserService")
 public interface AuthUserService {
 
     /**
@@ -22,5 +23,5 @@ public interface AuthUserService {
      * @return
      */
     @GetMapping("/user/listAll")
-    List<AuthUser> listAll();
+    ResponseData<List<AuthUser>> listAll();
 }
