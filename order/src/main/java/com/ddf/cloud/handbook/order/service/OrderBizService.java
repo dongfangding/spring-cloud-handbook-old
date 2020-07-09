@@ -1,9 +1,6 @@
 package com.ddf.cloud.handbook.order.service;
 
-import com.ddf.cloud.handbook.api.model.usercenter.AuthUser;
-import com.ddf.cloud.handbook.api.sdk.order.OrderService;
-
-import java.util.List;
+import com.ddf.cloud.handbook.api.sdk.order.OrderSdkService;
 
 /**
  * <p>description</p >
@@ -12,11 +9,6 @@ import java.util.List;
  * @version 1.0
  * @date 2020/06/29 18:45
  */
-public interface OrderBizService extends OrderService {
+public interface OrderBizService extends OrderSdkService {
 
-    /**
-     * 查询全部用户
-     * @return
-     */
-    List<AuthUser> listAllUser();
 }

@@ -14,13 +14,14 @@
     <dependencies>
 
         <dependency>
-            <groupId>com.ddf.common</groupId>
-            <artifactId>ddf-common-core</artifactId>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-openfeign</artifactId>
+            <groupId>com.ddf.cloud</groupId>
+            <artifactId>common-handbook-core</artifactId>
+            <version>${parent.version}</version>
         </dependency>
 
         <dependency>

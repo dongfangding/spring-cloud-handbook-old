@@ -31,6 +31,7 @@ public class AuthUserDao extends ServiceImpl<AuthUserMapper, AuthUser> {
      * @date 2020/6/29 0029 17:18
      **/
     public List<AuthUser> listAll() {
-        return authUserMapper.selectList(null);
+        throw new RuntimeException("测试异常");
+//        return authUserMapper.selectList(null);
     }
 }

@@ -2,6 +2,7 @@ package com.ddf.cloud.handbook.order.controller;
 
 import com.ddf.cloud.handbook.api.model.usercenter.AuthUser;
 import com.ddf.cloud.handbook.api.sdk.usercenter.AuthUserService;
+import com.ddf.cloud.handbook.core.response.ResponseData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +27,7 @@ public class OrderController {
 
 
     @GetMapping("listAllUser")
-    public List<AuthUser> listAllUser() {
+    public ResponseData<List<AuthUser>> listAllUser() {
         return authUserService.listAll();
     }
 
