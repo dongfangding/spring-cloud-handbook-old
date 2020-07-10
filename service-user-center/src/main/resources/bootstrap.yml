@@ -1,0 +1,43 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /user-center
+
+spring:
+  profiles:
+    active: dev
+  application:
+    name: user-center
+  jackson:
+    time-zone: GMT+8
+    default-property-inclusion: ALWAYS
+    date-format: yyyy-MM-dd HH:mm:ss
+    locale: zh_CN
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+  ## mapper.xml文件所在路径
+  mapper-locations: classpath:com/ddf/cloud/usercenter/mapper/*.xml
+
+management:
+  health:
+    redis:
+      enabled: false
+    rabbit:
+      enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+    jmx:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+    shutdown:
+      enabled: true
+    jolokia:
+      enabled: true
