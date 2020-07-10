@@ -4,19 +4,19 @@
     <modelVersion>4.0.0</modelVersion>
     <packaging>pom</packaging>
     <modules>
-        <module>user-center</module>
+        <module>service-user-center</module>
         <module>common-api</module>
-        <module>order</module>
+        <module>service-order</module>
         <module>common-handbook</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.2.8.RELEASE</version>
+        <version>2.2.5.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.ddf.cloud</groupId>
-    <artifactId>handbook</artifactId>
+    <artifactId>spring-cloud-handbook</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>spring-cloud-handbook</name>
     <description>spring-cloud手册</description>
@@ -25,7 +25,7 @@
         <java.version>1.8</java.version>
         <spring-boot.version>2.2.8.RELEASE</spring-boot.version>
         <spring-cloud-alibaba.version>2.2.1.RELEASE</spring-cloud-alibaba.version>
-        <spring-cloud.version>Hoxton.SR5</spring-cloud.version>
+        <spring-cloud.version>Hoxton.SR3</spring-cloud.version>
         <mybatis.version>3.3.0</mybatis.version>
         <p6spy.version>3.8.2</p6spy.version>
         <commons-lang3.version>3.9</commons-lang3.version>
@@ -36,7 +36,6 @@
         <swagger.version>2.9.2</swagger.version>
         <swagger-ui.version>2.9.2</swagger-ui.version>
         <swagger-annotation-models-version>1.5.21</swagger-annotation-models-version>
-        <ddf-common.version>1.0.0</ddf-common.version>
     </properties>
 
     <dependencyManagement>

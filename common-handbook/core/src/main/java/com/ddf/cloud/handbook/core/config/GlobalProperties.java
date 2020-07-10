@@ -4,6 +4,7 @@ import com.ddf.cloud.handbook.core.exception.ExceptionHandlerAdvice;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -39,6 +40,7 @@ import java.util.List;
 @ConfigurationProperties(prefix = "customs.global-properties")
 @Getter
 @Setter
+@RefreshScope
 public class GlobalProperties {
 
     /**

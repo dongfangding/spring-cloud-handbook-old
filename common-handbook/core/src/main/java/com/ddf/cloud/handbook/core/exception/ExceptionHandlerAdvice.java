@@ -71,6 +71,8 @@ public class ExceptionHandlerAdvice {
             ignoreErrorStack = true;
         }
 
+        log.error("系统异常", exception);
+
         if (exception instanceof BaseException) {
             BaseException baseException = (BaseException) exception;
             return ResponseData.failure(baseException.getCode(), baseException.getMessage(),
