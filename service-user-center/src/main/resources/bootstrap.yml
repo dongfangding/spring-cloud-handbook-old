@@ -1,18 +1,21 @@
-server:
-  port: 8080
-  servlet:
-    context-path: /user-center
-
 spring:
-  profiles:
-    active: dev
   application:
     name: user-center
+  profiles:
+    active: dev
   jackson:
     time-zone: GMT+8
     default-property-inclusion: ALWAYS
     date-format: yyyy-MM-dd HH:mm:ss
     locale: zh_CN
+  cloud:
+    nacos:
+      config:
+        file-extension: yaml
+server:
+  port: 8080
+  servlet:
+    context-path: /user-center
 
 mybatis-plus:
   configuration:

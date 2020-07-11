@@ -4,11 +4,11 @@ spring:
       username: nacos
       password: nacos
       discovery:
-        namespace: dev
+        namespace: local
         server-addr: 127.0.0.1:8848
         group: DEFAULT_GROUP
       config:
-        namespace: dev
+        namespace: local
         file-extension: yaml
         config-retry-time: 1000
         refresh-enabled: true
