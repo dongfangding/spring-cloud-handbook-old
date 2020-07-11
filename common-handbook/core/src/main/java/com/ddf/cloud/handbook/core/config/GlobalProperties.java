@@ -65,4 +65,10 @@ public class GlobalProperties {
      */
     private List<String> ignoreErrorTraceProfile;
 
+
+    /**
+     * 在项目中无实际意义，存储作者
+     */
+    private String author;
+
 }
