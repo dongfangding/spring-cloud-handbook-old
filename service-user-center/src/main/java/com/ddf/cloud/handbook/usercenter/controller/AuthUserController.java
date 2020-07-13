@@ -1,19 +1,16 @@
 package com.ddf.cloud.handbook.usercenter.controller;
 
-import com.ddf.cloud.handbook.api.model.usercenter.AuthUser;
 import com.ddf.cloud.handbook.core.config.GlobalProperties;
-import com.ddf.cloud.handbook.core.response.ResponseData;
-import com.ddf.cloud.handbook.usercenter.service.AuthUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.annotation.RequestScope;
 
 import java.text.MessageFormat;
-import java.util.List;
 
 /**
  * <p>description</p >
@@ -28,20 +25,21 @@ import java.util.List;
 @RequestScope
 public class AuthUserController {
 
-    private final AuthUserService authUserService;
-
     private final GlobalProperties globalProperties;
+
+    private final Environment environment;
 
     @Value("${customs.user.name}")
     private String userName;
 
-    @GetMapping("listAll")
-    public ResponseData<List<AuthUser>> listAll() {
-        return ResponseData.success(authUserService.listAll());
-    }
-
     @GetMapping("testProperties")
     public String testProperties() {
-        return MessageFormat.format("author: {0}, userName: {1}", globalProperties.getAuthor(), userName);
+        return MessageFormat.format("author: {0}, 注入userName: {1}, 从环境变量中取userName: {2}," +
+                        "从共享配置文件中读取userName: {3}",
+                globalProperties.getAuthor(),
+                userName,
+                environment.getProperty("customs.user.name"),
+                environment.getProperty("customs.shard-config.user.name")
+        );
     }
 }
