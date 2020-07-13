@@ -8,10 +8,6 @@ spring:
     default-property-inclusion: ALWAYS
     date-format: yyyy-MM-dd HH:mm:ss
     locale: zh_CN
-  cloud:
-    nacos:
-      config:
-        file-extension: yaml
 server:
   port: 8080
   servlet:

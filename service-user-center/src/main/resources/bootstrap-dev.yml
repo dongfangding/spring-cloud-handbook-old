@@ -6,14 +6,18 @@ spring:
       discovery:
         namespace: dev
         server-addr: 127.0.0.1:8848
-        group: handbook
+        group: DEFAULT_GROUP
       config:
         namespace: dev
         file-extension: yaml
         config-retry-time: 1000
         refresh-enabled: true
         server-addr: 127.0.0.1:8848
-        group: handbook
+        group: DEFAULT_GROUP
+        shared-configs:
+          - dataId: shard-config-demo.yaml
+            group: DEFAULT_GROUP
+            refresh: true
   datasource:
     initialization-mode: ALWAYS
     type: com.alibaba.druid.pool.DruidDataSource

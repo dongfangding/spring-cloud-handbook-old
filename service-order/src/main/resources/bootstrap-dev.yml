@@ -55,9 +55,17 @@ spring:
 
 customs:
   global-properties:
-    author: dongfang.ding
-  user:
-    name: ddf
+    ignoreErrorTraceProfile:
+      - prod
+
+feign:
+  client:
+    config:
+      default:
+        readTimeout: 5000
+        connectTimeout: 5000
+    default-to-properties: true # 默认
+
 logging:
   level:
     root: info
