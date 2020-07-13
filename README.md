@@ -12,7 +12,7 @@
 
 | 依赖                 | 版本          | 作用           |
 | -------------------- | ------------- | -------------- |
-| spring-boot          | 2.2.8.RELEASE | 基础框架       |
+| spring-boot          | 2.2.5.RELEASE | 基础框架       |
 | spring-cloud         | Hoxton.SR5    | 提供组件pom    |
 | spring-cloud-alibaba | 2.2.1.RELEASE | 提供组件pom    |
 | mybatis-plus         | 3.3.0         | 简化数据库操作 |
@@ -242,18 +242,7 @@
 
 ### 运行
 
-`Nacos`默认端口号为8848， 提供可视化界面，访问地址为http://${nacos-host}:${nacos-port}/nacos，如http:://localhost:8848/nacos，登录用户名和密码都为`nacos`
-
-### 依赖
-
-```xml
-<dependency>
-    <groupId>com.alibaba.cloud</groupId>
-    <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
-</dependency>
-```
-
- 
+`Nacos`默认端口号为8848， 提供可视化界面，访问地址为http://${nacos-host}:${nacos-port}/nacos，如http:://localhost:8848/nacos，登录用户名和密码都为`nacos` 
 
 ### 概念
 
@@ -293,7 +282,20 @@
 
 > 这里讲述作为注册中心的相关配置， 在实际项目中由于项目本身数量和环境数量都会比较多，因此会配合前面提到的命名空间来综合使用
 
+##### 依赖
+
+```xml
+<dependency>
+    <groupId>com.alibaba.cloud</groupId>
+    <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+</dependency>
+```
+
+
+
 ##### 新建命名空间
+
+> 可选，但推荐使用，不是服务注册的步骤
 
 在控制台操作建立命名空间， `dev`和`prod`， 注意前面提到的`1.3`版本后才提供自定义命名空间ID,否则会是一长串字符
 
@@ -326,6 +328,46 @@ spring:
         server-addr: 127.0.0.1:8848        # nacos服务主机
         group: DEFAULT_GROUP            # 分组，这里采用了默认分组
 ```
+
+##### 服务发现与消费
+
+> 将`@EnableDiscoveryClient`注解加入到配置类中
+
+```java
+@SpringBootApplication(scanBasePackages = GlobalConst.GLOBAL_BASE_PACKAGE)
+@EnableDiscoveryClient
+public class UserCenterApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(UserCenterApplication.class, args);
+    }
+
+    @Bean
+    @LoadBalanced
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+}
+
+```
+
+如果只是要服务发现，只需要使用`EnableDiscoveryClient`即可，但一般我们使用微服务时，大部分服务不仅提供服务也会要消费服务，而消费服务一般都会注入`RestTemplate`来使用，当然也会使用到`openfeign`，但`openfeign`是基于`ribbon`的，我们还是要把`RestTemplate`注入到容器中；
+
+`    @LoadBalanced`的注解有两个作用，没加之前服务之间的调用是通过服务的地址进行接口直连调用的，而加入了注解之后，调用的时候只需要使用`spring.application.name`调用，而且如果服务有多个实例，可以提供负载均衡的功能。
+
+简单举个例子，上述我们当前服务名叫`user-center`，比如我们有一个`get`接口`/user/testProperties`，现在如果有另外一个服务想要调用这个接口，就可以使用注入的`RestTemplate`来操作
+
+简单示例如下
+
+```java
+@Autowired
+private RestTemplate restTemplate;
+
+public void callUserCenterTestProperties() {
+    restTemplate.getForObject("http://user-center/user/testProperties", String.class);
+}
+```
+
+
 
 #### 配置中心
 
@@ -511,3 +553,330 @@ public class AuthUserController {
 3. 共享配置如果开启动态刷新后，是否需要`@RequestScope`的规则和主配置是一样的
 
    
+
+## OpenFeign
+
+> https://github.com/OpenFeign/feign
+>
+> openfeign提供了一种面向`Rest`的通过接口来访问服务的一种方式，如果只使用`RestTemplate`则会造成大量不可维护和不统一的接口地址散落，而且不利用复用；
+>
+> 使用openfeign,可以将已暴露从rest接口再封装成接口，通过在接口上配置的访问路径，达到代码访问接口，实现访问服务，如果需要更改访问地址的话，调用方是不需要关心的.
+
+**非常重要的一个概念**
+
+`spring-cloud`微服务体系是基于`Rest`的，即`http`协议，而`dubbo`等`rpc`框架是基于`rmi`的，两者本质上有很大的不同；通俗的理解，使用`dubbo`的时候我们一般定义接口之后，然后服务提供者对接口进行实现之后，调用方只要引用接口就可以直接调用服务提供方提供的功能了；如果我们没有把接口暴露成外部接口，除了服务内部通过注册中心发现并调用外，该服务不会暴露成`http`接口可以被外部调用。
+
+但是`rest`就不一样了，如果一个服务想要被另外一个服务所消费，那么对应的服务提供者并且把接口做`@RequestMapping`映射，把接口暴露在外之后，服务内部也是通过这种方式调用的。所以在使用上来说是稍微麻烦一些的。
+
+从成型逻辑上是先有的业务接口，然后实现，然后映射成`rest`接口。然后如果这个接口需要内部`openfeign`调用，就要在抽一层接口，然后在接口上将访问路径指向暴露的`rest`接口访问路径。后面会详细解释这一块。
+
+### 依赖
+
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-openfeign</artifactId>
+</dependency>
+```
+
+
+
+### 前置准备
+
+加入用户模块要查询全部用户列表（简单演示，不考虑分页）
+
+1. 编写用户接口
+
+   ```java
+   public interface AuthUserService {
+   
+   
+       /**
+        * 查询全部用户列表
+        * @return
+        */
+       List<AuthUser> listAll();
+   }
+   ```
+
+2. 编写用户接口实现，省略查询
+
+   ```java
+   @Service
+   @RequiredArgsConstructor(onConstructor=@__(@Autowired))
+   public class AuthUserServiceImpl implements AuthUserService {
+   
+       private final AuthUserDao authUserDao;
+   
+       /**
+        * 查询全部用户列表
+        *
+        * @return
+        */
+       @Override
+       public List<AuthUser> listAll() {
+           return authUserDao.listAll();
+       }
+   }
+   ```
+
+3. 编写用户控制器代码，暴露rest接口
+
+   ```java
+   @RestController
+   @RequiredArgsConstructor(onConstructor=@__(@Autowired))
+   @RequestMapping("user")
+   public class AuthUserController {
+   
+       private final AuthUserService authUserService;
+   
+       @GetMapping("listAll")
+       public ResponseData<List<AuthUser>> listAll() {
+           return ResponseData.success(authUserService.listAll());
+       }
+   }
+   
+   ```
+
+**总结**
+
+如上代码是一个很简单的查询代码，而`openfeign`就是基于上述实现才能做到暴露服务调用接口的，必须要先暴露对外接口（当然也不是一定如此，也可以不写控制器，`openfeign`自己即作为暴露的接口，然后对这个接口做实现，然后将实现的类映射成`RestController`，这个在后面一个章节单独说一下吧，优劣本人也说不好）
+
+### 声明服务
+
+> 当前服务，我们配置了context-path为user-center, spring.application.name为user-center
+
+1. 声明`feign`接口，使用`@FeignClient`来标识这是一个`feign`调用的接口，`name`的值为当前服务名user-center, `path`的值不一定为context-path，可以理解为前缀，每个接口如果有一个共同的前缀都可以加到`path`属性中,最后一个属性`contextId`需要注意，目前如果针对同一个服务如果声明了两个接口类，就会报错
+
+   ```
+   The bean 'user-center.FeignClientSpecification' could not be registered. A bean with that name has already been defined and overriding is disabled.
+   
+   Action:
+   
+   Consider renaming one of the beans or enabling overriding by setting spring.main.allow-bean-definition-overriding=true
+   ```
+
+   实际上这是很正常的需求，因为同一个服务我们会声明不同模块的接口，必然会有多个，解决方法有两个，一个就是报错控制台提示的将属性`spring.main.allow-bean-definition-overriding`设置为true,
+
+   还有一种就是每个接口使用不同的`contextId`区分，两个有啥区别，我也不知道，只是感觉一看到重写就觉得怪怪的，很奇怪，以前版本记得是没这个问题的
+
+   
+
+   **接口上的路径规则**， 注意看接口上我们使用了`springmvc` 的注解`GetMapping`，看`openfeign`的文档说的是使用`RequestLine`，不过既然兼容`springmvc`的，那就用熟悉的；这个路径的规则对应的就是你想要这个接口去访问自己暴露的哪个`rest`接口，这个路径是随便填乱创造的，必须要和对应的控制器对应起来，如我们现在配置的`path`和接口的`GetMapping`,对应的就是这个接口实际上是要去调用`/user-center/user/listAll`接口
+
+   
+
+   **参数的规则**， 如果我们声明的接口是有参数的，则和使用`springmvc`是一样的用法，同样是使用`RequestBody`， `RequestParam`， `PathVariable`，但是有一点需要注意
+
+   在使用控制器如果我们要使用 `RequestParam`，我们如果不使用`name`属性的时候，默认接收的参数名就是当前方法声明的形参的变量名，但是在声明`feign`接口的时候，这个属性是不能省略的，不写会出问题
+
+   即在`springmvc`中如果有代码如下，
+
+   ```java
+   @GetMapping("/user/getById")
+   public ResponseData<List<AuthUser>> getById(@RequestParam String id) {
+       
+   }
+   ```
+
+   对应在`feign`接口中必须是如下格式
+
+   ```java
+   @GetMapping("/user/getById")
+   public ResponseData<List<AuthUser>> getById(@RequestParam(name = "id") String id);
+   ```
+
+   
+
+   
+
+   **声明的feign接口如下**
+
+   ```java
+   package com.ddf.cloud.handbook.api.sdk.usercenter;
+   
+   
+   @FeignClient(name = ApiConstant.USER_CENTER_SERVICE_NAME, path = ApiConstant.USER_CENTER_SERVER_CONTEXT, contextId = "authUserService")
+   public interface AuthUserOutService {
+   
+       /**
+        * 查询全部用户列表
+        * @return
+        */
+       @GetMapping("/user/listAll")
+       ResponseData<List<AuthUser>> listAll();
+   
+   }
+   
+   ```
+
+   **注入上述代码将包名也放出来了，后面有大用**
+
+   
+
+### 消费服务
+
+1. 在消费者服务配置类使用注解`@EnableFeignClients`开启`feign`调用，注意默认扫描的是当前主启动类所在的包路径，这个规则可能并不能满足实际上我们`feign`接口所在的包，所以需要使用`basePackages`来指定一下我们服务实际所在的包
+2. 声明`RestTemplate`和`@LoadBalanced`，只有声明了`@LoadBalanced`之后才能通过服务名去调用以及完成负载均衡
+3. 配置注册中心，发现服务`@EnableDiscoveryClient`，如果是`Eureka`对应的则是`@EnableEurekeClient`，好像是这么写的，记不清楚了，也懒得再查，反正不用了
+4. 注入接口，完成调用
+
+  **对应代码如下**
+
+```yaml
+@SpringBootApplication(scanBasePackages = GlobalConst.GLOBAL_BASE_PACKAGE)
+@EnableDiscoveryClient
+@EnableFeignClients(basePackages = "com.ddf.cloud.handbook.api")
+public class OrderApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(OrderApplication.class);
+    }
+
+    @Bean
+    @LoadBalanced
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+}
+
+```
+
+注入调用
+
+```java
+@RestController
+@RequestMapping("order")
+@RequiredArgsConstructor(onConstructor=@__(@Autowired))
+public class OrderController {
+
+    private final AuthUserOutService authUserOutService;
+
+    @GetMapping("listAllUser")
+    public ResponseData<List<AuthUser>> listAllUser() {
+        return authUserOutService.listAll();
+    }
+
+}
+
+```
+
+### 超时控制
+
+超时是所有跨应用接口调用共同面对的一个问题，`feign`的默认超时时间是1000ms, 如果不满足我们实际情况的时候我们就要对这个配置进行修改
+
+1. 向容器中注入`Request.Options`对象， `feign`在完成超时配置的时候会去判断自定义注入这个`bean`，如果存在的话就会用我们自己注入的这个，我们可以在项目的`common`模块中注入这个对象以提供所有服务的相对比较实际的默认超时时间
+
+   ```java
+   @Bean
+   @Primary
+   public Request.Options options() {
+       return new Request.Options(10, TimeUnit.SECONDS, 10, TimeUnit.SECONDS, true);
+   }
+   ```
+
+   
+
+2. 经过1之后，如果服务将上面的`bean`纳入容器管理，则实现了全局服务默认的超时处理，但是如果自定义的默认还是不满足当前服务，就可以使用配置文件来覆盖服务, default指配置了当前服务默认使用这个配置，`config`属性是一个Map结构，key也可以为具体服务名，如果服务名与当前服务匹配的话，优先级是高于`default`的
+
+   ```yaml
+   feign:
+     client:
+       config:
+         default:
+           readTimeout: 5000
+           connectTimeout: 5000
+         某个服务的名称作为Key,如(user-center):
+         	readTimeout: 6000
+        	connectTimeout: 6000
+   ```
+
+   **优先级问题**
+
+   配置文件匹配的具体服务名的配置 > 配置文件的default的配置 >  > 注入`bean`
+
+3. 即使经过了上述配置之后，针对某些接口来说依然觉得这个配置的粒度还是比较粗的，如果我们想要配置某个具体`feign`接口的超时，又需要如何去做呢？
+
+   参考了仓库有人提的issue https://github.com/OpenFeign/feign/pull/970
+
+   1. 重载接口，提供一个默认接收超时配置的接口，超时处理让调用方去抉择
+
+      ```java
+      @FeignClient(name = ApiConstant.USER_CENTER_SERVICE_NAME, path = ApiConstant.USER_CENTER_SERVER_CONTEXT, contextId = "authUserService")
+      public interface AuthUserSdkService {
+      
+          /**
+           * 查询全部用户列表
+           * @param options 控制超时参数
+           * @return
+           */
+          @GetMapping("/user/listAll")
+          ResponseData<List<AuthUser>> listAll(Request.Options options);
+      
+          /**
+           * 查询全部用户列表
+           * @return
+           */
+          @GetMapping("/user/listAll")
+          ResponseData<List<AuthUser>> listAll();
+      
+      }
+      ```
+
+   2. 如果项目中最终采用了这几种方案的组合，其实看下来就会发现，我们需要定义一批超时对象，以供我们选择，如默认的，或者取出来直接用的，那么我们就可以在项目的通用包模块下单独定义一个配置类，专门用来定义`Request.Options`，统一定义，谁用谁注入，然后传入接口中，举个例子如下
+
+      ```java
+      @Configuration
+      public class FeignConfiguration {
+      
+          /**
+           *
+           * feign的默认超时时间只有1000ms,这里向容器中注入一个默认的超时时间， 客户端也可以使用配置	  *	的形式来覆盖这个默认的
+           */
+          @Bean
+          @Primary
+          public Request.Options options() {
+              return new Request.Options(10, TimeUnit.SECONDS, 10, TimeUnit.SECONDS, true);
+          }
+      
+          /**
+           *
+           * feign的接口可以接受一个入参对象(Request.Options),这样就可以自定义每个接口的超时时间了，这里预定义几个参数
+           * 参考 https://github.com/OpenFeign/feign/pull/970
+           *
+           * @return
+           */
+          @Bean
+          public Request.Options oneSecondsOptions() {
+              return new Request.Options(1, TimeUnit.SECONDS, 1, TimeUnit.SECONDS, true);
+          }
+      
+      
+          /**
+           *
+           * feign的接口可以接受一个入参对象(Request.Options),这样就可以自定义每个接口的超时时间了，这里预定义几个参数
+           * 参考 https://github.com/OpenFeign/feign/pull/970
+           *
+           * @return
+           */
+          @Bean
+          public Request.Options fiveSecondsOptions() {
+              return new Request.Options(5, TimeUnit.SECONDS, 5, TimeUnit.SECONDS, true);
+          }
+      
+          /**
+           *
+           * feign的接口可以接受一个入参对象(Request.Options),这样就可以自定义每个接口的超时时间了，这里预定义几个参数
+           * 参考 https://github.com/OpenFeign/feign/pull/970
+           *
+           * @return
+           */
+          @Bean
+          public Request.Options thirtySecondsOptions() {
+              return new Request.Options(30, TimeUnit.SECONDS, 30, TimeUnit.SECONDS, true);
+          }
+      }
+      
+      ```
+
+      
