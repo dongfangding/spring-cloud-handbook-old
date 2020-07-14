@@ -3,14 +3,17 @@ package com.ddf.cloud.handbook.usercenter.controller;
 import com.ddf.cloud.handbook.api.model.usercenter.AuthUser;
 import com.ddf.cloud.handbook.core.config.GlobalProperties;
 import com.ddf.cloud.handbook.core.response.ResponseData;
+import com.ddf.cloud.handbook.usercenter.bo.AuthUserRegistryBo;
 import com.ddf.cloud.handbook.usercenter.service.AuthUserService;
+import com.ddf.cloud.handbook.usercenter.vo.AuthUserVo;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.MessageFormat;
 import java.util.List;
@@ -25,6 +28,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor(onConstructor=@__(@Autowired))
 @RequestMapping("user")
+@Api(value = "用户控制器", tags = {"用户控制器"})
 public class AuthUserController {
 
     private final GlobalProperties globalProperties;
@@ -56,4 +60,19 @@ public class AuthUserController {
     public ResponseData<List<AuthUser>> listAll() {
         return ResponseData.success(authUserService.listAll());
     }
+
+    /**
+     * 用户注册
+     *
+     * @param authUserRegistryBo
+     * @return com.ddf.boot.quick.model.vo.AuthUserVo
+     * @author dongfang.ding
+     * @date 2019/12/9 0009 20:07
+     **/
+    @PostMapping("/registry")
+    @ApiOperation(value = "用户注册")
+    public AuthUserVo registry(@RequestBody @ApiParam(value = "注册请求参数", required = true) AuthUserRegistryBo authUserRegistryBo) {
+        return authUserService.registry(authUserRegistryBo);
+    }
+
 }
