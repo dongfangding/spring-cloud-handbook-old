@@ -238,11 +238,11 @@
 
 > https://github.com/alibaba/nacos/releases
 >
-> https://github.com/alibaba/Nacos这个页面最下面有一个`Download`下提供了百度云的下载，上面那个下载太难了
+> https://github.com/alibaba/Nacos 这个页面最下面有一个`Download`下提供了百度云的下载，上面那个下载太难了
 
 ### 运行
 
-`Nacos`默认端口号为8848， 提供可视化界面，访问地址为http://${nacos-host}:${nacos-port}/nacos，如http:://localhost:8848/nacos，登录用户名和密码都为`nacos` 
+`Nacos`默认端口号为8848， 提供可视化界面，访问地址为http://${nacos-host}:${nacos-port}/nacos，如http:://localhost:8848/nacos，登录用户名和密码都为`nacos`
 
 ### 概念
 
@@ -291,7 +291,7 @@
 </dependency>
 ```
 
-
+ 
 
 ##### 新建命名空间
 
@@ -340,14 +340,14 @@ public class UserCenterApplication {
     public static void main(String[] args) {
         SpringApplication.run(UserCenterApplication.class, args);
     }
-
+ 
     @Bean
     @LoadBalanced
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
 }
-
+ 
 ```
 
 如果只是要服务发现，只需要使用`EnableDiscoveryClient`即可，但一般我们使用微服务时，大部分服务不仅提供服务也会要消费服务，而消费服务一般都会注入`RestTemplate`来使用，当然也会使用到`openfeign`，但`openfeign`是基于`ribbon`的，我们还是要把`RestTemplate`注入到容器中；
@@ -361,13 +361,13 @@ public class UserCenterApplication {
 ```java
 @Autowired
 private RestTemplate restTemplate;
-
+ 
 public void callUserCenterTestProperties() {
     restTemplate.getForObject("http://user-center/user/testProperties", String.class);
 }
 ```
 
-
+ 
 
 #### 配置中心
 
@@ -409,10 +409,14 @@ spring:
     nacos:
       username: nacos                #  nacos控制台登录用户名
       password: nacos                #  nacos控制台登录密码
-      config:   
+      discovery:
+        namespace: dev
+        server-addr: 127.0.0.1:8848
+        group: DEFAULT_GROUP
+      config: 
         namespace: dev                # 命名空间id,注意要对应控制台新建配置时所选择的命名空间
         file-extension: yaml          # 新建配置时，配置文件的扩展名，对应在Nacos控制台新建配置时选择的配置格式
-        config-retry-time: 1000    
+        config-retry-time: 1000  
         refresh-enabled: true         # 是否开启配置文件动态刷新，默认true,配合@RequestScope实现配置热更新
         server-addr: 127.0.0.1:8848 # nacos服务器地址
         group: DEFAULT_GROUP        # 分组
@@ -420,11 +424,11 @@ spring:
 
 如上配置内容，对应的则是在`nacos`服务端有一个命名空间，id为`dev`，然后去读取配置文件`user-center-dev.yaml`
 
-
+ 
 
 > 项目启动完成之后，即先在项目中做好配置，然后再在配置中心新建配置，也是可以的。
 
-
+ 
 
 ##### 共享配置
 
@@ -434,7 +438,7 @@ spring:
 
 ![](https://vipkshttps4.wiz.cn/ks/share/resources/581c88a2-8001-4020-87a9-fb85b53ffcbf/51e1b9ed-802c-4b70-9747-8fcf442dfa1e/index_files/5856da0b-54c7-43d9-91af-58bafb852538.png)
 
-
+ 
 
 调整之前的`bootstrap-dev.yaml`,增加`shared-configs`
 
@@ -446,47 +450,30 @@ spring:
     nacos:
       username: nacos                #  nacos控制台登录用户名
       password: nacos                #  nacos控制台登录密码
-      config:   
+      discovery:
+        namespace: dev
+        server-addr: 127.0.0.1:8848
+        group: DEFAULT_GROUP
+      config: 
         namespace: dev                # 命名空间id,注意要对应控制台新建配置时所选择的命名空间
         file-extension: yaml          # 新建配置时，配置文件的扩展名，对应在Nacos控制台新建配置时选择的配置格式
-        config-retry-time: 1000    
+        config-retry-time: 1000  
         refresh-enabled: true         # 是否开启配置文件动态刷新，默认true,配合@RequestScope实现配置热更新
         server-addr: 127.0.0.1:8848 # nacos服务器地址
         group: DEFAULT_GROUP        # 分组
         shared-configs:
           - dataId: shard-config-demo.yaml
             group: DEFAULT_GROUP
-            refresh: true			# 是否开启动态刷新，这个默认是false
+            refresh: true            # 是否开启动态刷新，这个默认是false
 ```
 
-)
-
-```yaml
-spring:
-  application:
-    name: "user-center"
-  cloud:
-    nacos:
-      username: nacos                #  nacos控制台登录用户名
-      password: nacos                #  nacos控制台登录密码
-      config:   
-        namespace: dev                # 命名空间id,注意要对应控制台新建配置时所选择的命名空间
-        file-extension: yaml          # 新建配置时，配置文件的扩展名，对应在Nacos控制台新建配置时选择的配置格式
-        config-retry-time: 1000    
-        refresh-enabled: true         # 是否开启配置文件动态刷新，默认true,配合@RequestScope实现配置热更新
-        server-addr: 127.0.0.1:8848 # nacos服务器地址
-        group: DEFAULT_GROUP        # 分组
-        shared-configs:
-          - dataId: shard-config-demo.yaml
-            group: DEFAULT_GROUP
-            refresh: true			# 是否开启动态刷新，这个默认是false
-```
+ 
 
 **注意**
 
 针对共享配置的动态刷新默认是关闭的，配置中心的主配置文件的动态刷新默认是开启的，关于动态刷新详见后面一章
 
-
+ 
 
 ##### 动态刷新
 
@@ -516,14 +503,14 @@ customs:
 @RequestMapping("user")
 @RequestScope
 public class AuthUserController {
-
+ 
     private final GlobalProperties globalProperties;
-
+ 
     private final Environment environment;
-
+ 
     @Value("${customs.user.name}")
     private String userName;
-
+ 
     @GetMapping("testProperties")
     public String testProperties() {
         return MessageFormat.format("author: {0}, 注入userName: {1}, 从环境变量中取userName: {2}," +
@@ -535,7 +522,7 @@ public class AuthUserController {
         );
     }
 }
-
+ 
 ```
 
 **说明**
@@ -552,7 +539,7 @@ public class AuthUserController {
 
 3. 共享配置如果开启动态刷新后，是否需要`@RequestScope`的规则和主配置是一样的
 
-   
+ 
 
 ## OpenFeign
 
@@ -579,7 +566,7 @@ public class AuthUserController {
 </dependency>
 ```
 
-
+ 
 
 ### 前置准备
 
@@ -589,8 +576,9 @@ public class AuthUserController {
 
    ```java
    public interface AuthUserService {
-   
-   
+   ```
+
+
        /**
         * 查询全部用户列表
         * @return
@@ -598,16 +586,16 @@ public class AuthUserController {
        List<AuthUser> listAll();
    }
    ```
-
+ 
 2. 编写用户接口实现，省略查询
-
+ 
    ```java
    @Service
    @RequiredArgsConstructor(onConstructor=@__(@Autowired))
    public class AuthUserServiceImpl implements AuthUserService {
-   
+ 
        private final AuthUserDao authUserDao;
-   
+ 
        /**
         * 查询全部用户列表
         *
@@ -627,15 +615,15 @@ public class AuthUserController {
    @RequiredArgsConstructor(onConstructor=@__(@Autowired))
    @RequestMapping("user")
    public class AuthUserController {
-   
+ 
        private final AuthUserService authUserService;
-   
+ 
        @GetMapping("listAll")
        public ResponseData<List<AuthUser>> listAll() {
            return ResponseData.success(authUserService.listAll());
        }
    }
-   
+ 
    ```
 
 **总结**
@@ -650,9 +638,9 @@ public class AuthUserController {
 
    ```
    The bean 'user-center.FeignClientSpecification' could not be registered. A bean with that name has already been defined and overriding is disabled.
-   
+ 
    Action:
-   
+ 
    Consider renaming one of the beans or enabling overriding by setting spring.main.allow-bean-definition-overriding=true
    ```
 
@@ -660,11 +648,11 @@ public class AuthUserController {
 
    还有一种就是每个接口使用不同的`contextId`区分，两个有啥区别，我也不知道，只是感觉一看到重写就觉得怪怪的，很奇怪，以前版本记得是没这个问题的
 
-   
+ 
 
    **接口上的路径规则**， 注意看接口上我们使用了`springmvc` 的注解`GetMapping`，看`openfeign`的文档说的是使用`RequestLine`，不过既然兼容`springmvc`的，那就用熟悉的；这个路径的规则对应的就是你想要这个接口去访问自己暴露的哪个`rest`接口，这个路径是随便填乱创造的，必须要和对应的控制器对应起来，如我们现在配置的`path`和接口的`GetMapping`,对应的就是这个接口实际上是要去调用`/user-center/user/listAll`接口
 
-   
+ 
 
    **参数的规则**， 如果我们声明的接口是有参数的，则和使用`springmvc`是一样的用法，同样是使用`RequestBody`， `RequestParam`， `PathVariable`，但是有一点需要注意
 
@@ -675,7 +663,7 @@ public class AuthUserController {
    ```java
    @GetMapping("/user/getById")
    public ResponseData<List<AuthUser>> getById(@RequestParam String id) {
-       
+ 
    }
    ```
 
@@ -686,33 +674,33 @@ public class AuthUserController {
    public ResponseData<List<AuthUser>> getById(@RequestParam(name = "id") String id);
    ```
 
-   
+ 
 
-   
+ 
 
    **声明的feign接口如下**
 
    ```java
    package com.ddf.cloud.handbook.api.sdk.usercenter;
-   
-   
+ 
+ 
    @FeignClient(name = ApiConstant.USER_CENTER_SERVICE_NAME, path = ApiConstant.USER_CENTER_SERVER_CONTEXT, contextId = "authUserService")
    public interface AuthUserOutService {
-   
+ 
        /**
         * 查询全部用户列表
         * @return
         */
        @GetMapping("/user/listAll")
        ResponseData<List<AuthUser>> listAll();
-   
+ 
    }
-   
+ 
    ```
 
    **注入上述代码将包名也放出来了，后面有大用**
 
-   
+ 
 
 ### 消费服务
 
@@ -728,18 +716,18 @@ public class AuthUserController {
 @EnableDiscoveryClient
 @EnableFeignClients(basePackages = "com.ddf.cloud.handbook.api")
 public class OrderApplication {
-
+ 
     public static void main(String[] args) {
         SpringApplication.run(OrderApplication.class);
     }
-
+ 
     @Bean
     @LoadBalanced
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
 }
-
+ 
 ```
 
 注入调用
@@ -749,16 +737,16 @@ public class OrderApplication {
 @RequestMapping("order")
 @RequiredArgsConstructor(onConstructor=@__(@Autowired))
 public class OrderController {
-
+ 
     private final AuthUserOutService authUserOutService;
-
+ 
     @GetMapping("listAllUser")
     public ResponseData<List<AuthUser>> listAllUser() {
         return authUserOutService.listAll();
     }
-
+ 
 }
-
+ 
 ```
 
 ### 超时控制
@@ -775,7 +763,7 @@ public class OrderController {
    }
    ```
 
-   
+ 
 
 2. 经过1之后，如果服务将上面的`bean`纳入容器管理，则实现了全局服务默认的超时处理，但是如果自定义的默认还是不满足当前服务，就可以使用配置文件来覆盖服务, default指配置了当前服务默认使用这个配置，`config`属性是一个Map结构，key也可以为具体服务名，如果服务名与当前服务匹配的话，优先级是高于`default`的
 
@@ -787,8 +775,8 @@ public class OrderController {
            readTimeout: 5000
            connectTimeout: 5000
          某个服务的名称作为Key,如(user-center):
-         	readTimeout: 6000
-        	connectTimeout: 6000
+             readTimeout: 6000
+            connectTimeout: 6000
    ```
 
    **优先级问题**
@@ -804,7 +792,7 @@ public class OrderController {
       ```java
       @FeignClient(name = ApiConstant.USER_CENTER_SERVICE_NAME, path = ApiConstant.USER_CENTER_SERVER_CONTEXT, contextId = "authUserService")
       public interface AuthUserSdkService {
-      
+ 
           /**
            * 查询全部用户列表
            * @param options 控制超时参数
@@ -812,14 +800,14 @@ public class OrderController {
            */
           @GetMapping("/user/listAll")
           ResponseData<List<AuthUser>> listAll(Request.Options options);
-      
+ 
           /**
            * 查询全部用户列表
            * @return
            */
           @GetMapping("/user/listAll")
           ResponseData<List<AuthUser>> listAll();
-      
+ 
       }
       ```
 
@@ -828,17 +816,17 @@ public class OrderController {
       ```java
       @Configuration
       public class FeignConfiguration {
-      
+ 
           /**
            *
-           * feign的默认超时时间只有1000ms,这里向容器中注入一个默认的超时时间， 客户端也可以使用配置	  *	的形式来覆盖这个默认的
+           * feign的默认超时时间只有1000ms,这里向容器中注入一个默认的超时时间， 客户端也可以使用配置      *    的形式来覆盖这个默认的
            */
           @Bean
           @Primary
           public Request.Options options() {
               return new Request.Options(10, TimeUnit.SECONDS, 10, TimeUnit.SECONDS, true);
           }
-      
+ 
           /**
            *
            * feign的接口可以接受一个入参对象(Request.Options),这样就可以自定义每个接口的超时时间了，这里预定义几个参数
@@ -850,8 +838,9 @@ public class OrderController {
           public Request.Options oneSecondsOptions() {
               return new Request.Options(1, TimeUnit.SECONDS, 1, TimeUnit.SECONDS, true);
           }
-      
-      
+      ```
+
+
           /**
            *
            * feign的接口可以接受一个入参对象(Request.Options),这样就可以自定义每个接口的超时时间了，这里预定义几个参数
@@ -863,7 +852,7 @@ public class OrderController {
           public Request.Options fiveSecondsOptions() {
               return new Request.Options(5, TimeUnit.SECONDS, 5, TimeUnit.SECONDS, true);
           }
-      
+     
           /**
            *
            * feign的接口可以接受一个入参对象(Request.Options),这样就可以自定义每个接口的超时时间了，这里预定义几个参数
@@ -876,7 +865,155 @@ public class OrderController {
               return new Request.Options(30, TimeUnit.SECONDS, 30, TimeUnit.SECONDS, true);
           }
       }
-      
+     
       ```
 
-      
+ 
+
+## spring-cloud-gateway
+
+> spring-cloud-gateway是spring基于spring-boot和webflux、netty实现的新一代网关，但是说实话，由于对webflux的完全不熟悉，一些原来很简单的功能在使用spring-cloud-gateway上时用的非常费劲
+>
+> 官方文档传送门，说实话想看的内容几乎都看不到，就在那里说一堆很少用到的断言
+>
+> https://cloud.spring.io/spring-cloud-static/spring-cloud-gateway/2.2.3.RELEASE/reference/html
+
+### 依赖
+
+> 项目一定要排除依赖spring-webmvc,spring-boot-starter-tomcat啊之类的,spring-cloud-gateway使用netty作为容器
+>
+> 作为曾经踩过的坑，备注在此 https://blog.csdn.net/yichen0429/article/details/98203775
+
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-gateway</artifactId>
+</dependency>
+```
+
+由于使用了nacos作为服务注册发现和配置中心，所以还需要引入nacos的依赖，这一部分看具体自己选型，不是gateway本身的依赖
+
+```xml
+<dependency>
+    <groupId>com.alibaba.cloud</groupId>
+    <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>com.alibaba.cloud</groupId>
+    <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+</dependency>
+```
+
+
+
+### 启动报错汇总
+
+> 由于spring-cloud-gateway抛弃了熟悉的webmvc而使用了webflux，启动 的时候错误百出，一不小心，就报各种各样的错，还是单独汇总出来一下
+
+```java
+org.springframework.context.ApplicationContextException: Unable to start web server; nested exception is org.springframework.context.ApplicationContextException: Unable to start ServletWebServerApplicationContext due to missing ServletWebServerFactory bean.
+
+```
+
+```java
+Caused by: org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'org.springframework.core.convert.ConversionService' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {@org.springframework.beans.factory.annotation.Qualifier(value=webFluxConversionService)}
+
+```
+
+上述两个错误，使用`mavenhelper`工具分析一下到底哪个`jar`包依赖了`springmvc`，将包排除即可解决
+
+
+
+```java
+java.lang.ClassCastException: org.springframework.core.io.buffer.DefaultDataBufferFactory cannot be cast to org.springframework.core.io.buffer.NettyDataBufferFactory
+
+```
+
+上面这个错误，启动正常，表现形式为网关工作转发正常，目标服务返回数据也正常，但是网关会无法解析返回的数据，检查下项目是否依赖了`spring-boot-starter-tomcat`，排除即可
+
+
+
+```java
+Caused by: java.lang.ClassNotFoundException: javax.servlet.Servlet
+```
+
+上述错误，基本是在已经排除了`web`容器之后，但是我们项目里可能注册了一些`servlet`， 因为排除依赖之后，没有`servlet`环境了，所以报错了。如`druid`数据库连接池，我们配置了`stat-view-servlet`
+
+
+
+### 服务启动
+
+使用`@EnableDiscoveryClient`注解来发现同一注册中心内的服务
+
+```java
+@SpringBootApplication(scanBasePackages = GlobalConst.GLOBAL_BASE_PACKAGE)
+@EnableDiscoveryClient
+public class GatewayApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(GatewayApplication.class, args);
+    }
+}
+```
+
+
+
+### 路由配置
+
+> https://cloud.spring.io/spring-cloud-static/spring-cloud-gateway/2.2.3.RELEASE/reference/html/#the-path-route-predicate-factory
+
+```yaml
+server:
+  port: 8888
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: user-center
+          uri: lb://user-center
+          predicates:
+            - Path=/user-center/**
+        - id: order
+          uri: lb://order
+          predicates:
+            - Path=/order/**
+```
+
+`routes`是一个list,用于配置路由规则集合
+
+`id`不重复即可，无特殊要求，一般用服务名即可，方便辨识
+
+`predicates` 断言，用来与当前请求路径进行匹配，如果匹配成功，则转发请求到对应的`uri`上
+
+`uri` 当`predicates` 匹配成功后，网关则将请求转发到配置的`uri`上，在整个微服务架构中，这里一般我们都是通过服务名去进行访问的，因此这里配置服务名，加上`lb`的意思就提供负载均衡
+
+如上述配置
+
+访问`http://${host}:8888/user-center/user/listAll`，则网关会将请求转发到服务`user-center`，然后调用`/user-center/user/listAll`，注意`user-center`转发的时候是不会舍弃的，这个时候就需要注意，我们对应的服务是否有这个路径；
+
+比如`user-center`服务配置了`context-path`为`user-center`， 方法的控制层路径为`/user/listAll`，那么路径转发过来的时候由于我们配置了`user-center`,那么路径就能够完全匹配到，接口就可以被正常访问；
+
+**注意注意注意**
+
+> https://cloud.spring.io/spring-cloud-static/spring-cloud-gateway/2.2.3.RELEASE/reference/html/#the-stripprefix-gatewayfilter-factory
+
+还有一种情况，比如我们的服务没有配置`context-path`，那么最终转发到具体服务的时候就没有`user-center`这部分，就需要我们配置的时候舍弃这部分，这个时候**`StripPrefix`**这个参数的作用就出来了，这个参数可以舍弃路径中的分段，从左边开始计算，比如**`StripPrefix=1`**,这转发的时候路径就变成了`/user/listAll`， 如果**`StripPrefix=2`**，则转发的时候路径就变成了`/listAll`，配置内容示例如下
+
+```yaml
+server:
+  port: 8888
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: user-center
+          uri: lb://user-center
+          predicates:
+            - Path=/user-center/**
+          filters:
+            - StripPrefix=1
+```
+
+
+

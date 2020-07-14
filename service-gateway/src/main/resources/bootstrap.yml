@@ -1,0 +1,47 @@
+server:
+  port: 8888
+
+spring:
+  profiles:
+    active: dev
+  application:
+    name: gateway
+  jackson:
+    time-zone: GMT+8
+    default-property-inclusion: ALWAYS
+    date-format: yyyy-MM-dd HH:mm:ss
+    locale: zh_CN
+  cloud:
+    gateway:
+      routes:
+        - id: user-center
+          uri: lb://user-center
+          predicates:
+            - Path=/user-center/**
+#          - filters:               ## 从左开始舍弃路径的分段
+#              - StripPrefix=1
+        - id: order
+          uri: lb://order
+          predicates:
+            - Path=/order/**
+
+management:
+  health:
+    redis:
+      enabled: false
+    rabbit:
+      enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+    jmx:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+    shutdown:
+      enabled: true
+    jolokia:
+      enabled: true

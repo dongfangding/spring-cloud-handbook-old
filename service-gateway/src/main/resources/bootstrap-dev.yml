@@ -44,14 +44,6 @@ spring:
         wall:
           enabled: true # 开启WallFilter
           db-type: mysql
-      ## 开启内置监控界面 访问路径: /context-path/druid/index.html
-      stat-view-servlet:
-        enabled: true
-        url-pattern: /druid/*
-        reset-enable: true
-        login-username: admin
-        login-password: 123456
-        # allow: 白名单
 
 customs:
   global-properties:

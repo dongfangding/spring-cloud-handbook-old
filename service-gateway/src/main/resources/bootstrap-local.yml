@@ -4,11 +4,11 @@ spring:
       username: nacos
       password: nacos
       discovery:
-        namespace: dev
+        namespace: local
         server-addr: 127.0.0.1:8848
         group: DEFAULT_GROUP
       config:
-        namespace: dev
+        namespace: local
         file-extension: yaml
         config-retry-time: 1000
         refresh-enabled: true
@@ -44,19 +44,6 @@ spring:
         wall:
           enabled: true # 开启WallFilter
           db-type: mysql
-      ## 开启内置监控界面 访问路径: /context-path/druid/index.html
-      stat-view-servlet:
-        enabled: true
-        url-pattern: /druid/*
-        reset-enable: true
-        login-username: admin
-        login-password: 123456
-        # allow: 白名单
-
-customs:
-  global-properties:
-    ignoreErrorTraceProfile:
-      - prod
 
 feign:
   client:
