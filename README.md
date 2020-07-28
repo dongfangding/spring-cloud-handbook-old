@@ -413,10 +413,10 @@ spring:
         namespace: dev
         server-addr: 127.0.0.1:8848
         group: DEFAULT_GROUP
-      config: 
+      config:
         namespace: dev                # 命名空间id,注意要对应控制台新建配置时所选择的命名空间
         file-extension: yaml          # 新建配置时，配置文件的扩展名，对应在Nacos控制台新建配置时选择的配置格式
-        config-retry-time: 1000  
+        config-retry-time: 1000 
         refresh-enabled: true         # 是否开启配置文件动态刷新，默认true,配合@RequestScope实现配置热更新
         server-addr: 127.0.0.1:8848 # nacos服务器地址
         group: DEFAULT_GROUP        # 分组
@@ -454,10 +454,10 @@ spring:
         namespace: dev
         server-addr: 127.0.0.1:8848
         group: DEFAULT_GROUP
-      config: 
+      config:
         namespace: dev                # 命名空间id,注意要对应控制台新建配置时所选择的命名空间
         file-extension: yaml          # 新建配置时，配置文件的扩展名，对应在Nacos控制台新建配置时选择的配置格式
-        config-retry-time: 1000  
+        config-retry-time: 1000 
         refresh-enabled: true         # 是否开启配置文件动态刷新，默认true,配合@RequestScope实现配置热更新
         server-addr: 127.0.0.1:8848 # nacos服务器地址
         group: DEFAULT_GROUP        # 分组
@@ -576,37 +576,36 @@ public class AuthUserController {
 
    ```java
    public interface AuthUserService {
-   ```
-
-
-       /**
-        * 查询全部用户列表
-        * @return
-        */
-       List<AuthUser> listAll();
+      /**
+       * 查询全部用户列表
+       * @return
+       */
+      List<AuthUser> listAll();
    }
    ```
- 
+   
 2. 编写用户接口实现，省略查询
- 
+
    ```java
    @Service
    @RequiredArgsConstructor(onConstructor=@__(@Autowired))
    public class AuthUserServiceImpl implements AuthUserService {
- 
+   
        private final AuthUserDao authUserDao;
- 
+   
        /**
-        * 查询全部用户列表
-        *
-        * @return
-        */
+           * 查询全部用户列表
+           *
+           * @return
+           */
        @Override
        public List<AuthUser> listAll() {
            return authUserDao.listAll();
        }
    }
    ```
+
+   
 
 3. 编写用户控制器代码，暴露rest接口
 
@@ -615,16 +614,17 @@ public class AuthUserController {
    @RequiredArgsConstructor(onConstructor=@__(@Autowired))
    @RequestMapping("user")
    public class AuthUserController {
- 
+    
        private final AuthUserService authUserService;
- 
+    
        @GetMapping("listAll")
        public ResponseData<List<AuthUser>> listAll() {
            return ResponseData.success(authUserService.listAll());
        }
    }
- 
    ```
+
+   
 
 **总结**
 
@@ -676,8 +676,6 @@ public class AuthUserController {
 
  
 
- 
-
    **声明的feign接口如下**
 
    ```java
@@ -698,7 +696,7 @@ public class AuthUserController {
  
    ```
 
-   **注入上述代码将包名也放出来了，后面有大用**
+   **注意上述代码将包名也放出来了，后面有大用**
 
  
 
@@ -838,37 +836,85 @@ public class OrderController {
           public Request.Options oneSecondsOptions() {
               return new Request.Options(1, TimeUnit.SECONDS, 1, TimeUnit.SECONDS, true);
           }
-      ```
-
-
+              
           /**
-           *
-           * feign的接口可以接受一个入参对象(Request.Options),这样就可以自定义每个接口的超时时间了，这里预定义几个参数
-           * 参考 https://github.com/OpenFeign/feign/pull/970
-           *
-           * @return
-           */
+             *
+             * feign的接口可以接受一个入参对象(Request.Options),这样就可以自定义每个接口的超时时间了，这里预定义几个参数
+             * 参考 https://github.com/OpenFeign/feign/pull/970
+             *
+             * @return
+             */
           @Bean
           public Request.Options fiveSecondsOptions() {
               return new Request.Options(5, TimeUnit.SECONDS, 5, TimeUnit.SECONDS, true);
           }
-     
+      
           /**
-           *
-           * feign的接口可以接受一个入参对象(Request.Options),这样就可以自定义每个接口的超时时间了，这里预定义几个参数
-           * 参考 https://github.com/OpenFeign/feign/pull/970
-           *
-           * @return
-           */
+             *
+             * feign的接口可以接受一个入参对象(Request.Options),这样就可以自定义每个接口的超时时间了，这里预定义几个参数
+             * 参考 https://github.com/OpenFeign/feign/pull/970
+             *
+             * @return
+             */
           @Bean
           public Request.Options thirtySecondsOptions() {
               return new Request.Options(30, TimeUnit.SECONDS, 30, TimeUnit.SECONDS, true);
           }
       }
-     
       ```
 
- 
+ ### 自动注入
+
+**问题**
+
+可以看到在消费服务的时候，需要使用`@EnableFeignClients`来引入暴露服务包名，但是一般在开发环境中，我们会存在很多不同模块的`feign`的调用接口，而这部分接口并不关注具体实现，因此我们的实践方法都会是将这些`api`接口调用模块单独抽到一个模块里维护，当服务之间互相调用的时候，只要引入对应模块的`api`包即可。但是现在我们提供了模块包之后，却还需要使用方，显示的使用注解`@EnableFeignClients`，将接口所属的包路径给配置出来，我们就在想能不能在模块包中完成这部分的功能
+
+* 在api模块包中提供一个配置类，将接口所在的包路径给扫描进去
+
+  ```java
+  package com.ddf.cloud.handbook.api.config;
+  
+  import com.ddf.cloud.handbook.api.constant.ApiConstant;
+  import org.springframework.cloud.openfeign.EnableFeignClients;
+  import org.springframework.context.annotation.Configuration;
+  
+  /**
+   * <p>feign接口的自动装配类
+   *
+   * 如果引入该模块的服务主启动类所在的包路径正好能够扫描到该类，则该类配置成自动装配就是多余的。
+   * 但是从通用性上来说，还是要配置一下自动状态
+   *
+   * </p >
+   *
+   * @author Snowball
+   * @version 1.0
+   * @date 2020/07/28 09:33
+   */
+  @Configuration
+  @EnableFeignClients(basePackages = ApiConstant.FEIGN_API_BASE_PACKAGES)
+  public class FeignAutoConfiguration {
+  }
+  
+  ```
+
+* 在`api`模块resource下新建文件夹`META-INF`,然后新建文件`spring.factories`，最后在配置自动配置类的地方加上我们自己的配置类，内容如下
+
+  ```
+  ## 自动装配类
+  org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+    com.ddf.cloud.handbook.api.config.FeignAutoConfiguration
+  ```
+
+* 经过上述配置，当使用方引入了我们的模块之后，模块内部的配置类就会生效，自动完成接口配置的装配功能。当然正如自动配置类上的注释所说，如果你引入服务的模块已经显示的将整个项目的包扫描路径给扩大了范围，直接已经包含了自动配置类所在的路径时，最后一步配置文件就是多余的了。
+
+  打个比方，api自动配置类所在包为com.test.test1.test2， 应用所在包为com.test.test1.app。
+
+  然后由于你自己开发的相关服务都遵循了一定规则的前缀，你直接在app应用主启动类上指定了包扫描路径为
+
+  com.test，那么配置自动状态自然是多余的了，但是配置类是一定要在的。
+
+
+
 
 ## spring-cloud-gateway
 
@@ -898,14 +944,14 @@ public class OrderController {
     <groupId>com.alibaba.cloud</groupId>
     <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
 </dependency>
-
+ 
 <dependency>
     <groupId>com.alibaba.cloud</groupId>
     <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
 </dependency>
 ```
 
-
+ 
 
 ### 启动报错汇总
 
@@ -913,26 +959,26 @@ public class OrderController {
 
 ```java
 org.springframework.context.ApplicationContextException: Unable to start web server; nested exception is org.springframework.context.ApplicationContextException: Unable to start ServletWebServerApplicationContext due to missing ServletWebServerFactory bean.
-
+ 
 ```
 
 ```java
 Caused by: org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'org.springframework.core.convert.ConversionService' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {@org.springframework.beans.factory.annotation.Qualifier(value=webFluxConversionService)}
-
+ 
 ```
 
 上述两个错误，使用`mavenhelper`工具分析一下到底哪个`jar`包依赖了`springmvc`，将包排除即可解决
 
-
+ 
 
 ```java
 java.lang.ClassCastException: org.springframework.core.io.buffer.DefaultDataBufferFactory cannot be cast to org.springframework.core.io.buffer.NettyDataBufferFactory
-
+ 
 ```
 
 上面这个错误，启动正常，表现形式为网关工作转发正常，目标服务返回数据也正常，但是网关会无法解析返回的数据，检查下项目是否依赖了`spring-boot-starter-tomcat`，排除即可
 
-
+ 
 
 ```java
 Caused by: java.lang.ClassNotFoundException: javax.servlet.Servlet
@@ -940,7 +986,7 @@ Caused by: java.lang.ClassNotFoundException: javax.servlet.Servlet
 
 上述错误，基本是在已经排除了`web`容器之后，但是我们项目里可能注册了一些`servlet`， 因为排除依赖之后，没有`servlet`环境了，所以报错了。如`druid`数据库连接池，我们配置了`stat-view-servlet`
 
-
+ 
 
 ### 服务启动
 
@@ -950,14 +996,14 @@ Caused by: java.lang.ClassNotFoundException: javax.servlet.Servlet
 @SpringBootApplication(scanBasePackages = GlobalConst.GLOBAL_BASE_PACKAGE)
 @EnableDiscoveryClient
 public class GatewayApplication {
-
+ 
     public static void main(String[] args) {
         SpringApplication.run(GatewayApplication.class, args);
     }
 }
 ```
 
-
+ 
 
 ### 路由配置
 
@@ -1015,5 +1061,4 @@ spring:
             - StripPrefix=1
 ```
 
-
-
+ 

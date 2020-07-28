@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -27,13 +26,25 @@ public class OrderController {
 
     private final AuthUserSdkService authUserSdkService;
 
-    @Resource(name = "oneSecondsOptions")
-    private Request.Options oneSecondsOptions;
+    private final Request.Options fiveSecondsOptions;
 
-
+    /**
+     * 使用配置文件设置的超时时间进行feign调用
+     * @return
+     */
     @GetMapping("listAllUser")
     public ResponseData<List<AuthUser>> listAllUser() {
-        return authUserSdkService.listAll(oneSecondsOptions);
+        return authUserSdkService.listAll();
+    }
+
+
+    /**
+     * 调用方自定义超时配置进行接口调用
+     * @return
+     */
+    @GetMapping("listAllUserByOptions")
+    public ResponseData<List<AuthUser>> listAllUserByOptions() {
+        return authUserSdkService.listAll(fiveSecondsOptions);
     }
 
 }

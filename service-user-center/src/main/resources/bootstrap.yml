@@ -2,7 +2,7 @@ spring:
   application:
     name: user-center
   profiles:
-    active: dev
+    active: local
   jackson:
     time-zone: GMT+8
     default-property-inclusion: ALWAYS

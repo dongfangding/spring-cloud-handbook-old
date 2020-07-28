@@ -4,7 +4,6 @@ package com.ddf.cloud.handbook.core.exception;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import com.ddf.cloud.handbook.core.config.GlobalProperties;
-import com.ddf.cloud.handbook.core.constant.GlobalConst;
 import com.ddf.cloud.handbook.core.helper.EnvironmentHelper;
 import com.ddf.cloud.handbook.core.response.ResponseData;
 import lombok.extern.slf4j.Slf4j;
@@ -16,13 +15,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.List;
 
 /**
- * <p>description</p >
+ * <p></p >
  *
  * @author Snowball
  * @version 1.0
  * @date 2020/06/28 10:20
  */
-@RestControllerAdvice(basePackages = {GlobalConst.GLOBAL_BASE_PACKAGE})
+@RestControllerAdvice
 @Slf4j
 public class ExceptionHandlerAdvice {
 

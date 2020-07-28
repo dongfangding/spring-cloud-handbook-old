@@ -13,4 +13,11 @@ public class GlobalConst {
      * 全局基础包扫描包路径
      */
     public static final String GLOBAL_BASE_PACKAGE = "com.ddf.cloud";
+
+    /**
+     * 核心包功能扫描路径
+     */
+    public static final String CORE_BASE_PACKAGE = "com.ddf.cloud.handbook.core";
+
+
 }

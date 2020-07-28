@@ -29,4 +29,9 @@ public class ApiConstant {
      */
     public static final String ORDER_SERVER_CONTEXT = "user-center";
 
+    /**
+     * Feign接口所在的包路径
+     */
+    public static final String FEIGN_API_BASE_PACKAGES = "com.ddf.cloud.handbook.api.sdk";
+
 }
