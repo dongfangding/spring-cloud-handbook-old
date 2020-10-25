@@ -4,7 +4,7 @@
 # git log | grep "^Author: " | awk '{print $2 $3}' | sort | uniq -c
 
 git filter-branch -f --env-filter '
-OLD_EMAIL="dingdongfang@runxsports.com"
+OLD_EMAIL="Yichen&942436"
 CORRECT_NAME="dongfang.ding"
 CORRECT_EMAIL="1041765757@qq.com"
 if [ "$GIT_COMMITTER_EMAIL" = "$OLD_EMAIL" ]
